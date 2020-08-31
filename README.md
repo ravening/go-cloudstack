@@ -68,3 +68,14 @@ Sander van Harmelen (<sander@xanzy.io>)
 ## License
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at <http://www.apache.org/licenses/LICENSE-2.0>
+
+
+## Adding new API's
+
+1. Add the api name in `generate/layout.go`
+
+2. Add the api parameters and response definition in `generate/listApis.json`
+
+3. Build the package using `go build generate/generate.go generate/layout.go`
+
+4. Generate the code using `./generate/generate`
