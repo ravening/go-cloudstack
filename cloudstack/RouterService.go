@@ -1344,3 +1344,106 @@ type StopRouterResponse struct {
 	Zoneid              string `json:"zoneid"`
 	Zonename            string `json:"zonename"`
 }
+
+type GetRouterHealthCheckResultsParams struct {
+	p map[string]interface{}
+}
+
+func (p *GetRouterHealthCheckResultsParams) toURLValues() url.Values {
+	u := url.Values{}
+	if p.p == nil {
+		return u
+	}
+	if v, found := p.p["performfreshchecks"]; found {
+		vv := strconv.FormatBool(v.(bool))
+		u.Set("performfreshchecks", vv)
+	}
+	if v, found := p.p["routerid"]; found {
+		u.Set("routerid", v.(string))
+	}
+	return u
+}
+
+func (p *GetRouterHealthCheckResultsParams) SetPerformfreshchecks(v bool) {
+	if p.p == nil {
+		p.p = make(map[string]interface{})
+	}
+	p.p["performfreshchecks"] = v
+	return
+}
+
+func (p *GetRouterHealthCheckResultsParams) SetRouterid(v string) {
+	if p.p == nil {
+		p.p = make(map[string]interface{})
+	}
+	p.p["routerid"] = v
+	return
+}
+
+// You should always use this function to get a new GetRouterHealthCheckResultsParams instance,
+// as then you are sure you have configured all required params
+func (s *RouterService) NewGetRouterHealthCheckResultsParams(routerid string) *GetRouterHealthCheckResultsParams {
+	p := &GetRouterHealthCheckResultsParams{}
+	p.p = make(map[string]interface{})
+	p.p["routerid"] = routerid
+	return p
+}
+
+// Get Router health check results
+func (s *RouterService) GetRouterHealthCheckResults(p *GetRouterHealthCheckResultsParams) (*GetRouterHealthCheckResultsResponse, error) {
+	resp, err := s.cs.newRequest("getRouterHealthCheckResults", p.toURLValues())
+	if err != nil {
+		return nil, err
+	}
+
+	var r GetRouterHealthCheckResultsResponse
+	if err := json.Unmarshal(resp, &r); err != nil {
+		return nil, err
+	}
+
+	return &r, nil
+}
+
+type GetRouterHealthCheckResultsResponse struct {
+	RouterHealthCheckResponse `json:"routerhealthchecks"`
+}
+
+type RouterHealthCheckResponse struct {
+	Routerid string `json:"routerid"`
+	Healthcheck []HealthChecks `json:"healthchecks"`
+}
+
+type HealthChecks struct {
+	Checkname   string `json:"checkname"`
+	Checktype   string `json:"checktype"`
+	Details     string `json:"details"`
+	Lastupdated string `json:"lastupdated"`
+	Success     bool   `json:"success"`
+}
+
+func (r *GetRouterHealthCheckResultsResponse) UnmarshalJSON(b []byte) error {
+	var m map[string]interface{}
+	err := json.Unmarshal(b, &m)
+	if err != nil {
+		return err
+	}
+
+	if success, ok := m["success"].(string); ok {
+		m["success"] = success == "true"
+		b, err = json.Marshal(m)
+		if err != nil {
+			return err
+		}
+	}
+
+	if ostypeid, ok := m["ostypeid"].(float64); ok {
+		m["ostypeid"] = strconv.Itoa(int(ostypeid))
+		b, err = json.Marshal(m)
+		if err != nil {
+			return err
+		}
+	}
+
+	type alias GetRouterHealthCheckResultsResponse
+	return json.Unmarshal(b, (*alias)(r))
+}

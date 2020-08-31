@@ -337,6 +337,7 @@ var layout = apiInfo{
 		"rebootRouter",
 		"startRouter",
 		"stopRouter",
+		"getRouterHealthCheckResults",
 	},
 	"ProjectService": {
 		"activateProject",
